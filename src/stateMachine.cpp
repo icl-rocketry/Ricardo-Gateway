@@ -35,10 +35,10 @@ Written by the Electronics team, Imperial College London Rocketry
 
 stateMachine::stateMachine() : 
     vspi(VSPI),
-    hspi(HSPI),
+    // hspi(HSPI),
     I2C(0),
     usbserial(Serial,systemstatus,logcontroller),
-    radio(hspi,systemstatus,logcontroller),
+    radio(vspi,systemstatus,logcontroller),
     canbus(systemstatus,logcontroller,3),
     networkmanager(static_cast<uint8_t>(DEFAULT_ADDRESS::GROUNDSTATION_GATEWAY),NODETYPE::HUB,true),
     commandhandler(this),
@@ -58,13 +58,15 @@ void stateMachine::initialise(State* initStatePtr) {
   vspi.setBitOrder(MSBFIRST);
   vspi.setDataMode(SPI_MODE0);
 
-  hspi.begin();
-  hspi.setFrequency(8000000);
-  hspi.setBitOrder(MSBFIRST);
-  hspi.setDataMode(SPI_MODE0);
+  // hspi.begin();
+  // hspi.setFrequency(8000000);
+  // hspi.setBitOrder(MSBFIRST);
+  // hspi.setDataMode(SPI_MODE0);
   //open serial port on usb interface
   Serial.begin(Serial_baud);
   Serial.setRxBufferSize(SERIAL_SIZE_RX);
+
+  logcontroller.setup();
 
   //setup interfaces
   usbserial.setup();
@@ -77,13 +79,13 @@ void stateMachine::initialise(State* initStatePtr) {
   networkmanager.addInterface(&radio);
   networkmanager.addInterface(&canbus);
 
-  networkmanager.enableAutoRouteGen(true);
-  networkmanager.setNoRouteAction(NOROUTE_ACTION::BROADCAST,{1,2,3});
+  networkmanager.enableAutoRouteGen(false);
+  networkmanager.setNoRouteAction(NOROUTE_ACTION::BROADCAST,{1,3});
 
    // command handler callback
   networkmanager.registerService(static_cast<uint8_t>(DEFAULT_SERVICES::COMMAND),commandhandler.getCallback()); 
     
-  logcontroller.setup();
+  
   networkmanager.setLogCb([this](const std::string& message){return logcontroller.log(message);});
 
  

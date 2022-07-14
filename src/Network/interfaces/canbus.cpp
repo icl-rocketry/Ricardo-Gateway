@@ -32,13 +32,16 @@ void CanBus::setup()
 {
     if (can_driver_install(&can_general_config,&can_timing_config,&can_filter_config) != ESP_OK){
         _systemstatus.new_message(SYSTEM_FLAG::ERROR_CAN,"Can iface failed to install!");
+   
         return;
     }
     if (can_start() != ESP_OK){
         _systemstatus.new_message(SYSTEM_FLAG::ERROR_CAN,"Can Iface failed to start!");
+    
         return;
     }
-    
+    _logcontroller.log("Can started!");
+
 }
 
 void CanBus::sendPacket(RnpPacket& data){
@@ -91,7 +94,6 @@ void CanBus::processSendBuffer(){
     if (_sendBuffer.empty()){
         return;
     }
-
   
     const send_buffer_element_t& packet = _sendBuffer.front();
     const size_t data_size = packet.bytedata.size();
@@ -111,6 +113,7 @@ void CanBus::processSendBuffer(){
     if (err != ESP_OK){
         if (err == ESP_ERR_TIMEOUT || err == ESP_FAIL){
             // can tx buffer full, dont increment seg_id and try to place on buffer next update
+            _logcontroller.log("Can tx buffer full");
             return;
         }
         // proper error might be worth throwing here? -> future
@@ -144,6 +147,7 @@ void CanBus::processReceivedPackets(){
         }
         return;
     }
+
     if (!(can_packet.flags & CAN_MSG_FLAG_EXTD)){
         _logcontroller.log("Bad Can Packet Type, Packet Dumped!");
         return;
@@ -152,10 +156,13 @@ void CanBus::processReceivedPackets(){
     const RnpCanIdentifier can_identifier(can_packet.identifier);
     const uint32_t can_packet_uid = RnpCanIdentifier::getCanPacketUID(can_packet.identifier);
 
+
     if (can_identifier.seg_id == 0) // marks the start of a new packet
     {
+
         //check if uid already exists in receive buffer
         if (_receiveBuffer.count(can_packet_uid)){
+
             // receive buffer already contains a matching uid implying that we will never receive
             // the rest of the previous packet with the matching key so remove the old packet. 
             // to ensure that someone hasnt messed up rollover of seg_id, we check the last seg_id so that we
@@ -168,6 +175,7 @@ void CanBus::processReceivedPackets(){
             }
             _receiveBuffer.erase(can_packet_uid); //erase previous entry and start new packet
         }
+        
 
         //construct new received packet buffer element
         //check if receiveBuffer has space to push back to
@@ -206,7 +214,7 @@ void CanBus::processReceivedPackets(){
         //resize vector
         receive_buffer_element.bytedata.resize(bytedata_size + can_packet.data_length_code);
         //copy new data
-        std::memcpy(receive_buffer_element.bytedata.data(),&can_packet.data,can_packet.data_length_code);
+        std::memcpy(receive_buffer_element.bytedata.data()+ bytedata_size,&can_packet.data,can_packet.data_length_code);
         //update last time modified 
         receive_buffer_element.last_time_modified = millis();
 
@@ -217,6 +225,7 @@ void CanBus::processReceivedPackets(){
             {
                 RnpHeader header(receive_buffer_element.bytedata);
                 receive_buffer_element.expected_size = header.packet_len + RnpHeader::size();
+                
                 //reserve vector size to reduce more allocations
                 receive_buffer_element.bytedata.reserve(receive_buffer_element.expected_size);
             }

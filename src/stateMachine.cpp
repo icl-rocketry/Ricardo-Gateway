@@ -38,7 +38,7 @@ stateMachine::stateMachine() :
     hspi(HSPI),
     I2C(0),
     usbserial(Serial,systemstatus,logcontroller),
-    radio(hspi,systemstatus,logcontroller),
+    radio(hspi,systemstatus,logcontroller,RADIO_MODE::TURN_TIMEOUT),
     canbus(systemstatus,logcontroller,3),
     networkmanager(static_cast<uint8_t>(DEFAULT_ADDRESS::GROUNDSTATION_GATEWAY),NODETYPE::HUB,true),
     commandhandler(this),
@@ -69,13 +69,13 @@ void stateMachine::initialise(State* initStatePtr) {
   //setup interfaces
   usbserial.setup();
   radio.setup();
-  canbus.setup();
+  // canbus.setup();
 
   //setup network manager so communication is running
   // add interfaces
   networkmanager.addInterface(&usbserial);
   networkmanager.addInterface(&radio);
-  networkmanager.addInterface(&canbus);
+  // networkmanager.addInterface(&canbus);
 
   networkmanager.enableAutoRouteGen(true);
   networkmanager.setNoRouteAction(NOROUTE_ACTION::BROADCAST,{1,2});

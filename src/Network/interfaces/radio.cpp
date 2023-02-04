@@ -36,7 +36,7 @@ void Radio::setup(){
     LoRa.setSPI(_spi);
 
 
-    if (!LoRa.begin(LORA_REGION)){
+    if (!LoRa.begin(867.5E6)){
         _systemstatus.new_message(SYSTEM_FLAG::ERROR_LORA,"Lora setting up");      
     };
     if (_systemstatus.flag_triggered(SYSTEM_FLAG::ERROR_LORA)){
@@ -154,7 +154,7 @@ size_t Radio::send(std::vector<uint8_t> &data){
         _txDone = false;
         _info.prevTimeSent = millis();
         _received = false; // used for turn_timeout mode
-        _logcontroller.log("sent");
+        // _logcontroller.log("sent");
         return data.size();
     }else{
         return 0;

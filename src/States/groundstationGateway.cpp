@@ -17,15 +17,16 @@ void GroundstationGateway::initialise(){
     //load the GroundstationGateway routing table
     RoutingTable routetable;
     routetable.setRoute((uint8_t)DEFAULT_ADDRESS::ROCKET,Route{2,1,{}});
-    routetable.setRoute((uint8_t)DEFAULT_ADDRESS::GROUNDSTATION,Route{1,1,{}});
+    routetable.setRoute(20,Route{1,1,{}});
 
     _sm->networkmanager.setRoutingTable(routetable);
     _sm->networkmanager.updateBaseTable(); // save the new base table
-    _sm->networkmanager.setAddress(static_cast<uint8_t>(DEFAULT_ADDRESS::GROUNDSTATION_GATEWAY));
+    _sm->networkmanager.setAddress(19);
 
     _sm->networkmanager.enableAutoRouteGen(true); // enable route learning
     _sm->networkmanager.setNoRouteAction(NOROUTE_ACTION::BROADCAST,{1,2}); // enable broadcast over serial and radio only
     
+
 };
 
 State* GroundstationGateway::update(){

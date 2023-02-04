@@ -69,22 +69,23 @@ void stateMachine::initialise(State* initStatePtr) {
   //setup interfaces
   usbserial.setup();
   radio.setup();
-  // canbus.setup();
+  canbus.setup();
 
   //setup network manager so communication is running
   // add interfaces
   networkmanager.addInterface(&usbserial);
   networkmanager.addInterface(&radio);
-  // networkmanager.addInterface(&canbus);
+  networkmanager.addInterface(&canbus);
 
   networkmanager.enableAutoRouteGen(true);
-  networkmanager.setNoRouteAction(NOROUTE_ACTION::BROADCAST,{1,2});
+  networkmanager.setNoRouteAction(NOROUTE_ACTION::BROADCAST,{1,2,3});
 
    // command handler callback
   networkmanager.registerService(static_cast<uint8_t>(DEFAULT_SERVICES::COMMAND),commandhandler.getCallback()); 
     
   logcontroller.setup();
   networkmanager.setLogCb([this](const std::string& message){return logcontroller.log(message);});
+
 
  
 

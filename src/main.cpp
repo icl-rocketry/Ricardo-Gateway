@@ -8,6 +8,7 @@
 #include <exception>
 #include "stateMachine.h"
 #include "States/groundstationGateway.h"
+#include "States/groundSupportGateway.h"
 
 stateMachine statemachine;
 

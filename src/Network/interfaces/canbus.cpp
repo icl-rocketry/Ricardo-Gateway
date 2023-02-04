@@ -108,6 +108,7 @@ void CanBus::processSendBuffer(){
     std::memcpy(&can_packet.data,packet.bytedata.data() + offset,can_packet.data_length_code);
 
     int err = can_transmit(&can_packet,0);//non blocking send
+    // _logcontroller.log("sent");
     if (err != ESP_OK){
         if (err == ESP_ERR_TIMEOUT || err == ESP_FAIL){
             // can tx buffer full, dont increment seg_id and try to place on buffer next update

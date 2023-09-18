@@ -1,14 +1,21 @@
-//command id and definition. find description on excel doc
-
+/**
+ * @file commands.h
+ * @author Kiran de Silva (kd619@ic.ac.uk)
+ * @brief Contains signatures of all commands in the system. Note there is no requirement ot have all the command signatures defined in a single file, just ensure all the seperate files are included into the command_config.h
+ * @version 0.1
+ * @date 2023-06-17
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 #pragma once
+#include <stdint.h>
 
-enum class COMMANDS:uint8_t {
-    Nocommand = 0,
-    Free_Ram = 250
-};
+#include "Config/forward_decl.h"
+#include <librnp/rnp_packet.h>
 
+namespace Commands{
+    
+    void FreeRamCommand(ForwardDecl_SystemClass& system, const RnpPacketSerialized& packet);
 
-
-
-
-
+}

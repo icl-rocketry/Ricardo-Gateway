@@ -6,6 +6,9 @@
 
 #include <HardwareSerial.h>
 
+#include <librnp/rnp_default_address.h>
+#include <librnp/rnp_routingtable.h>
+
 #include "Config/systemflags_config.h"
 #include "Config/commands_config.h"
 #include "Config/pinmap_config.h"
@@ -15,9 +18,17 @@
 
 #include "States/idle.h"
 
+#ifdef CONFIG_IDF_TARGET_ESP32S3
+static constexpr int VSPI_BUS_NUM = 0;
+static constexpr int HSPI_BUS_NUM = 1;
+#else
+static constexpr int VSPI_BUS_NUM = VSPI;
+static constexpr int HSPI_BUS_NUM = HSPI;
+#endif
 
-System::System():
-RicCoreSystem(Commands::command_map,Commands::defaultEnabledCommands,Serial)
+System::System() : RicCoreSystem(Commands::command_map, Commands::defaultEnabledCommands, Serial),
+                   hspi(HSPI_BUS_NUM), // CHANGE FOR esp32s3
+                   radio(hspi,  PinMap::LoraCs, PinMap::LoraReset, -1, systemstatus, RADIO_MODE::TURN_TIMEOUT,  2)
 {};
 
 
@@ -34,11 +45,10 @@ void System::systemSetup(){
 
     //any other setup goes here
 
+
     // network interfaces
-    usbserial.setup();
     radio.setup();
 
-    networkmanager.addInterface(&usbserial);
     networkmanager.addInterface(&radio);
 
     networkmanager.setNodeType(NODETYPE::HUB);

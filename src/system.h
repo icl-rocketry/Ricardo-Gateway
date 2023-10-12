@@ -6,6 +6,9 @@
 #include "Config/commands_config.h"
 #include "Config/pinmap_config.h"
 
+#include "Network/Interfaces/radio.h"
+#include "SPI.h"
+
 #include "Commands/commands.h"
 
 class System : public RicCoreSystem<System,SYSTEM_FLAG,Commands::ID>
@@ -18,7 +21,12 @@ class System : public RicCoreSystem<System,SYSTEM_FLAG,Commands::ID>
 
         void systemUpdate();
 
-    // private:
+        SPIClass hspi;
+        Radio radio;
+
+    //private:
+    
+    
 
 
 };

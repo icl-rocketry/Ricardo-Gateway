@@ -24,7 +24,8 @@ class System : public RicCoreSystem<System,SYSTEM_FLAG,Commands::ID>
         SPIClass hspi;
         Radio radio;
 
-    //private:
+    private:
+        void setupSPI();
     
     
 

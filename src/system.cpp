@@ -44,7 +44,7 @@ void System::systemSetup(){
     statemachine.initalize(std::make_unique<Idle>(systemstatus,commandhandler));
 
     //any other setup goes here
-
+    setupSPI();
 
     // network interfaces
     radio.setup();
@@ -62,3 +62,11 @@ void System::systemSetup(){
 
 
 void System::systemUpdate(){};
+
+void System::setupSPI()
+{
+    hspi.begin(PinMap::H_SCLK,PinMap::H_MISO,PinMap::H_MOSI);
+    hspi.setFrequency(8000000);
+    hspi.setBitOrder(MSBFIRST);
+    hspi.setDataMode(SPI_MODE0);
+}
